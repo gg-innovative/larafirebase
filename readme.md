@@ -26,25 +26,26 @@ For use cases such as instant messaging, a message can transfer a payload of up 
 Follow the steps below to install the package.
 
 
-**Composer**
+**Install via Composer**
 
 ```
 composer require gg-innovative/larafirebase
 ```
 
-**Copy Config**
+**Copy Configuration**
 
-Run `php artisan vendor:publish --provider="GGInnovative\Larafirebase\Providers\LarafirebaseServiceProvider"` to publish the `larafirebase.php` config file.
+Run the following command to publish the `larafirebase.php` config file:
 
-**Get Athentication Key**
-
-Get Authentication Key from https://console.firebase.google.com/
+```bash
+php artisan vendor:publish --provider="GGInnovative\Larafirebase\Providers\LarafirebaseServiceProvider"
+```
 
 **Configure larafirebase.php as needed**
 
-```
-'authentication_key' => '{AUTHENTICATION_KEY}'
-```
+Open the `larafirebase.php` configuration file, which you just published, and set the following values as needed:
+
+- `project_id`: Replace with your actual Firebase project ID.
+- `firebase_credentials`: This refers to the JSON credentials file for your Firebase project. Make sure it points to the correct location in your project. This JSON file contains the authentication information for your Firebase project, allowing your Laravel application to interact with Firebase services. You can generate this JSON file in the Firebase Console. Once you have it, specify its path in this configuration.
 
 ### Usage
 
