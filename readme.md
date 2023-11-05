@@ -57,25 +57,45 @@ use GGInnovative\Larafirebase\Facades\Larafirebase;
 
 class MyController
 {
-    private $deviceTokens = ['{TOKEN_1}', '{TOKEN_2}'];
-
     public function sendNotification()
     {
         return Larafirebase::withTitle('Test Title')
             ->withBody('Test body')
             ->withImage('https://firebase.google.com/images/social.png')
-            ->withIcon('https://seeklogo.com/images/F/firebase-logo-402F407EE0-seeklogo.com.png')
-            ->withSound('default')
-            ->withClickAction('https://www.google.com')
-            ->withPriority('high')
             ->withAdditionalData([
-                'color' => '#rrggbb',
-                'badge' => 0,
+                'name' => 'wrench',
+                'mass' => '1.3kg',
+                'count' => '3'
             ])
-            ->sendNotification($this->deviceTokens);
+            ->withToken('TOKEN_HERE')
+            ->sendNotification();
         
         // Or
-        return Larafirebase::fromArray(['title' => 'Test Title', 'body' => 'Test body'])->sendNotification($this->deviceTokens);
+        return Larafirebase::fromRaw([
+            // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
+            "name" => "string",
+            "data" => [
+                "string" => "string",
+            ],
+            "notification" => [
+                "object" => "(Notification)"
+            ],
+            "android" => [
+                "object" => "(AndroidConfig)"
+            ],
+            "webpush" => [
+                "object" => "(WebpushConfig)",
+            ],
+            "apns" => [
+                "object" => "(ApnsConfig)"
+            ],
+            "fcm_options" => [
+                "object" => "(FcmOptions)"
+            ],
+            "token" => "string",
+            "topic" => "string",
+            "condition" => "string"
+        ])->sendNotification();
     }
 }
 ```
@@ -101,15 +121,11 @@ class SendBirthdayReminder extends Notification
      */
     public function toFirebase($notifiable)
     {
-        $deviceTokens = [
-            '{TOKEN_1}',
-            '{TOKEN_2}'
-        ];
-        
         return (new FirebaseMessage)
             ->withTitle('Hey, ', $notifiable->first_name)
             ->withBody('Happy Birthday!')
-            ->asNotification($deviceTokens);
+            ->withToken('TOKEN_HERE')
+            ->asNotification();
     }
 }
 ```
@@ -117,64 +133,3 @@ class SendBirthdayReminder extends Notification
 ### Tips
 
 - You can use `larafirebase()` helper instead of Facade.
-
-### Payload
-
-Check how is formed payload to send to firebase:
-
-Example 1:
-
-```php
-Larafirebase::withTitle('Test Title')->withBody('Test body')->sendNotification('token1');
-```
-
-```json
-{
-  "registration_ids": [
-    "token1"
-  ],
-  "notification": {
-    "title": "Test Title",
-    "body": "Test body"
-  },
-  "priority": "normal"
-}
-```
-
-Example 2:
-
-```php
-Larafirebase::withTitle('Test Title')->withBody('Test body')->sendMessage('token1');
-```
-
-```json
-{
-  "registration_ids": [
-    "token1"
-  ],
-  "data": {
-    "title": "Test Title",
-    "body": "Test body"
-  }
-}
-```
-
-If you want to create payload from scratch you can use method `fromRaw`, for example:
-
-```php
-return Larafirebase::fromRaw([
-    'registration_ids' => ['token1', 'token2'],
-    'data' => [
-        'key_1' => 'Value 1',
-        'key_2' => 'Value 2'
-    ],
-    'android' => [
-        'ttl' => '1000s',
-        'priority' => 'normal',
-        'notification' => [
-            'key_1' => 'Value 1',
-            'key_2' => 'Value 2'
-        ],
-    ],
-])->send();
-```

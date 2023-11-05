@@ -2,6 +2,8 @@
 
 return [
 
-    'authentication_key' => null
+    'project_id' => '123321',
+
+    'firebase_credentials' => public_path('firebase_credentials.json')
 
 ];

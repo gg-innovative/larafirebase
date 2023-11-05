@@ -2,34 +2,27 @@
 
 namespace GGInnovative\Larafirebase\Services;
 
+use Google\Client;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use GGInnovative\Larafirebase\Exceptions\UnsupportedTokenFormat;
+use Illuminate\Support\Facades\Cache;
+use Google\Service\FirebaseCloudMessaging;
 
 class Larafirebase
 {
-    const PRIORITY_NORMAL = 'normal';
-
     private $title;
 
     private $body;
 
-    private $clickAction;
-
     private $image;
-
-    private $icon;
 
     private $additionalData;
 
-    private $sound;
-
-    private $priority = self::PRIORITY_NORMAL;
-
-    private $fromArray;
+    private $token;
 
     private $fromRaw;
 
-    const API_URI = 'https://fcm.googleapis.com/fcm/send';
+    public const API_URI = 'https://fcm.googleapis.com/v1/projects/:projectId/messages:send';
 
     public function withTitle($title)
     {
@@ -45,37 +38,9 @@ class Larafirebase
         return $this;
     }
 
-    public function withClickAction($clickAction)
-    {
-        $this->clickAction = $clickAction;
-
-        return $this;
-    }
-
     public function withImage($image)
     {
         $this->image = $image;
-
-        return $this;
-    }
-
-    public function withIcon($icon)
-    {
-        $this->icon = $icon;
-
-        return $this;
-    }
-
-    public function withSound($sound)
-    {
-        $this->sound = $sound;
-
-        return $this;
-    }
-     
-    public function withPriority($priority)
-    {
-        $this->priority = $priority;
 
         return $this;
     }
@@ -87,9 +52,9 @@ class Larafirebase
         return $this;
     }
 
-    public function fromArray($fromArray)
+    public function withToken($token)
     {
-        $this->fromArray = $fromArray;
+        $this->token = $token;
 
         return $this;
     }
@@ -101,66 +66,79 @@ class Larafirebase
         return $this;
     }
 
-    public function sendNotification($tokens)
+    public function sendNotification()
     {
-        $fields = array(
-            'registration_ids' => $this->validateToken($tokens),
-            'notification' => ($this->fromArray) ? $this->fromArray : [
-                'title' => $this->title,
-                'body' => $this->body,
-                'image' => $this->image,
-                'icon' => $this->icon,
-                'sound' => $this->sound,
-                'click_action' => $this->clickAction
+        if($this->fromRaw) {
+            return $this->callApi($this->fromRaw);
+        }
+
+        $payload = [
+            'message' => [
+                'notification' => [
+                    'title' => $this->title,
+                    'body' => $this->body,
+                    'image' => $this->image,
+                ],
             ],
-            'data' => $this->additionalData,
-            'priority' => $this->priority
-        );
-
-        return $this->callApi($fields);
-    }
-
-    public function sendMessage($tokens)
-    {
-        $data = ($this->fromArray) ? $this->fromArray : [
-            'title' => $this->title,
-            'body' => $this->body,
         ];
 
-        $data = $this->additionalData ? array_merge($data, $this->additionalData) : $data;
+        if($this->token) {
+            $payload['message']['token'] = $this->token;
+        }
 
-        $fields = array(
-            'registration_ids' => $this->validateToken($tokens),
-            'data' => $data,
-        );
+        if($this->additionalData) {
+            $payload['message']['data'] = $this->additionalData;
+        }
 
-        return $this->callApi($fields);
+        return $this->callApi($payload);
     }
 
-    public function send()
+    private function getBearerToken()
     {
-        return $this->callApi($this->fromRaw);
+        $client = new Client();
+        $client->setAuthConfig(config('larafirebase.firebase_credentials'));
+        $client->addScope(FirebaseCloudMessaging::CLOUD_PLATFORM);
+
+        $savedToken = Cache::get('LARAFIREBASE_AUTH_TOKEN');
+
+        if (!$savedToken) {
+            $accessToken = $this->generateNewBearerToken($client);
+            $client->setAccessToken($accessToken);
+
+            return $accessToken;
+        }
+
+        $client->setAccessToken($savedToken);
+
+        if (!$client->isAccessTokenExpired()) {
+            return json_decode($savedToken)->access_token;
+        }
+
+        $newAccessToken = $this->generateNewBearerToken($client);
+        $client->setAccessToken($newAccessToken);
+        return $newAccessToken['access_token'];
+
     }
 
-    private function callApi($fields)
+    private function generateNewBearerToken($client)
     {
+        $client->fetchAccessTokenWithAssertion();
+        $accessToken = $client->getAccessToken();
+
+        $tokenJson = json_encode($accessToken);
+        Cache::add('LARAFIREBASE_AUTH_TOKEN', $tokenJson);
+
+        return $accessToken;
+    }
+
+    private function callApi($fields): Response
+    {
+        $apiURL = str_replace(':projectId', config('larafirebase.project_id'), self::API_URI);
+
         $response = Http::withHeaders([
-            'Authorization' => 'key=' . config('larafirebase.authentication_key')
-        ])->post(self::API_URI, $fields);
+            'Authorization' => 'Bearer ' . $this->getBearerToken()
+        ])->post($apiURL, $fields);
 
-        return $response->body();
-    }
-
-    private function validateToken($tokens)
-    {
-        if (is_array($tokens)) {
-            return $tokens;
-        }
-
-        if (is_string($tokens)) {
-            return explode(',', $tokens);
-        }
-
-        throw new UnsupportedTokenFormat('Please pass tokens as array [token1, token2] or as string (use comma as separator if multiple passed).');
+        return $response;
     }
 }
