@@ -1,0 +1,36 @@
+{
+    "name": "gg-innovative/larafirebase",
+    "description": "Laravel Firebase Cloud Messaging.",
+    "homepage": "https://github.com/gg-innovative/larafirebase",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gentrit Abazi",
+            "email": "gentritabazi01@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "GGInnovative\\Larafirebase\\": "src/"
+        },
+        "files" : [
+            "src/Helpers/All.php"
+        ]
+    },
+    "require": {
+        "illuminate/support": "^7.0|^8.0|^9.0|^10.0",
+        "illuminate/notifications": "^7.0|^8.0|^9.0|^10.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+            "providers": [
+                "GGInnovative\\Larafirebase\\Providers\\LarafirebaseServiceProvider"
+            ]
+        }
+    }
+}
