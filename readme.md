@@ -68,7 +68,7 @@ class MyController
                 'mass' => '1.3kg',
                 'count' => '3'
             ])
-            ->withToken('TOKEN_HERE')
+            ->withToken('TOKEN_HERE') // You can use also withTopic
             ->sendNotification();
         
         // Or

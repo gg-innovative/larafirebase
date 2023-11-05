@@ -20,6 +20,8 @@ class Larafirebase
 
     private $token;
 
+    private $topic;
+
     private $fromRaw;
 
     public const API_URI = 'https://fcm.googleapis.com/v1/projects/:projectId/messages:send';
@@ -59,6 +61,13 @@ class Larafirebase
         return $this;
     }
 
+    public function withTopic($topic)
+    {
+        $this->topic = $topic;
+
+        return $this;
+    }
+
     public function fromRaw($fromRaw)
     {
         $this->fromRaw = $fromRaw;
@@ -84,6 +93,10 @@ class Larafirebase
 
         if($this->token) {
             $payload['message']['token'] = $this->token;
+        }
+
+        if($this->topic) {
+            $payload['message']['topic'] = $this->topic;
         }
 
         if($this->additionalData) {
