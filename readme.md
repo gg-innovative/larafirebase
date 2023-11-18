@@ -1,4 +1,4 @@
-<p align="center"><img src="/art/cover-v1.png" height="400"></p>
+<p align="center"><img src="/art/cover-v2.png" height="400"></p>
 
 <p align="center">
     <a href="https://packagist.org/packages/gg-innovative/larafirebase">
