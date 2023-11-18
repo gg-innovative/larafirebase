@@ -1,4 +1,4 @@
-<p align="center"><img src="/art/cover.png" height="400"></p>
+<p align="center"><img src="/art/cover-v1.png" height="400"></p>
 
 <p align="center">
     <a href="https://packagist.org/packages/gg-innovative/larafirebase">
@@ -51,7 +51,7 @@ Open the `larafirebase.php` configuration file, which you just published, and se
 
 Follow the steps below to find how to use the package.
 
-Example usage in **Controller/Service** or any class:
+Example usage in any class you want to use Larafirebase:
 
 ```php
 use GGInnovative\Larafirebase\Facades\Larafirebase;
@@ -60,8 +60,8 @@ class MyController
 {
     public function sendNotification()
     {
-        return Larafirebase::withTitle('Test Title')
-            ->withBody('Test body')
+        return Larafirebase::withTitle('Hello World')
+            ->withBody('I have something new to share with you!')
             ->withImage('https://firebase.google.com/images/social.png')
             ->withAdditionalData([
                 'name' => 'wrench',
