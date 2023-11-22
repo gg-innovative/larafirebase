@@ -118,7 +118,7 @@ class Larafirebase
             $accessToken = $this->generateNewBearerToken($client);
             $client->setAccessToken($accessToken);
 
-            return $accessToken;
+            return $accessToken['access_token'];
         }
 
         $client->setAccessToken($savedToken);
@@ -130,7 +130,6 @@ class Larafirebase
         $newAccessToken = $this->generateNewBearerToken($client);
         $client->setAccessToken($newAccessToken);
         return $newAccessToken['access_token'];
-
     }
 
     private function generateNewBearerToken($client)
