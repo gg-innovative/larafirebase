@@ -2,7 +2,12 @@
 
 namespace GGInnovative\Larafirebase\Messages;
 
-class FirebaseMessage
+use GGInnovative\Larafirebase\Services\Larafirebase;
+
+class FirebaseMessage extends Larafirebase
 {
-    // TBD
+    public function asNotification()
+    {
+        return parent::sendNotification();
+    }
 }
