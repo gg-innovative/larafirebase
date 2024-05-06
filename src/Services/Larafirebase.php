@@ -75,12 +75,8 @@ class Larafirebase
         return $this;
     }
 
-    public function sendNotification()
+    public function toArray()
     {
-        if($this->fromRaw) {
-            return $this->callApi($this->fromRaw);
-        }
-
         $payload = [
             'message' => [
                 'notification' => [
@@ -103,7 +99,16 @@ class Larafirebase
             $payload['message']['data'] = $this->additionalData;
         }
 
-        return $this->callApi($payload);
+        return $payload;
+    }
+
+    public function sendNotification()
+    {
+        if($this->fromRaw) {
+            return $this->callApi($this->fromRaw);
+        } else {
+            return $this->callApi($this->toArray());
+        }
     }
 
     private function getBearerToken()
