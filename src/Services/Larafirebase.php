@@ -106,6 +106,17 @@ class Larafirebase
         }
     }
 
+    public function sendNotifications(array $tokens)
+    {
+        array_push($tokens, $this->token);
+        $payload = $this->toArray();
+
+        foreach ($tokens as $token) {
+            $payload['message']['token'] = $token;
+            $this->callApi($payload);
+        }
+    }
+
     public function sendNotification()
     {
         return $this->callApi($this->toArray());
