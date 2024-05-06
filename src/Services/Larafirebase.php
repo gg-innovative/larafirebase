@@ -77,38 +77,38 @@ class Larafirebase
 
     public function toArray()
     {
-        $payload = [
-            'message' => [
-                'notification' => [
-                    'title' => $this->title,
-                    'body' => $this->body,
-                    'image' => $this->image,
+        if ($this->fromRaw) {
+            return $this->fromRaw;
+        } else {
+            $payload = [
+                'message' => [
+                    'notification' => [
+                        'title' => $this->title,
+                        'body' => $this->body,
+                        'image' => $this->image,
+                    ],
                 ],
-            ],
-        ];
-
-        if($this->token) {
-            $payload['message']['token'] = $this->token;
+            ];
+    
+            if($this->token) {
+                $payload['message']['token'] = $this->token;
+            }
+    
+            if($this->topic) {
+                $payload['message']['topic'] = $this->topic;
+            }
+    
+            if($this->additionalData) {
+                $payload['message']['data'] = $this->additionalData;
+            }
+    
+            return $payload;
         }
-
-        if($this->topic) {
-            $payload['message']['topic'] = $this->topic;
-        }
-
-        if($this->additionalData) {
-            $payload['message']['data'] = $this->additionalData;
-        }
-
-        return $payload;
     }
 
     public function sendNotification()
     {
-        if($this->fromRaw) {
-            return $this->callApi($this->fromRaw);
-        } else {
-            return $this->callApi($this->toArray());
-        }
+        return $this->callApi($this->toArray());
     }
 
     private function getBearerToken()
