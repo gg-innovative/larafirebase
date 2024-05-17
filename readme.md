@@ -68,11 +68,14 @@ class MyController
                 'mass' => '1.3kg',
                 'count' => '3'
             ])
+            // Either:
             ->withToken('TOKEN_HERE') // You can use also withTopic
             ->sendNotification();
+            // Or:
+            ->sendNotifications(["token1", "token2", ...])
         
         // Or
-        return Larafirebase::fromRaw([
+        $message = Larafirebase::fromRaw([
             // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
             "name" => "string",
             "data" => [
@@ -96,7 +99,13 @@ class MyController
             "token" => "string",
             "topic" => "string",
             "condition" => "string"
-        ])->sendNotification();
+        ]);
+
+        // You may now send the notification by the above documented methods
+        // or you may want to serialize the firebase-message and store it in a database by calling the `toArray()`-method:
+        $data = $message->toArray();
+        // Afterwards (for example inside a job) you are able to create a new message-instance by using the `fromRaw()`-method
+        Larafirebase::fromRaw($data);
     }
 }
 ```
