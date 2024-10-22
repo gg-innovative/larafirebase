@@ -18,6 +18,8 @@ class Larafirebase
 
     private $additionalData;
 
+    private $sound;
+
     private $token;
 
     private $topic;
@@ -50,6 +52,13 @@ class Larafirebase
     public function withAdditionalData($additionalData)
     {
         $this->additionalData = $additionalData;
+
+        return $this;
+    }
+
+    public function withSound($sound)
+    {
+        $this->sound = $sound;
 
         return $this;
     }
@@ -101,6 +110,11 @@ class Larafirebase
 
         if($this->additionalData) {
             $payload['message']['data'] = $this->additionalData;
+        }
+
+        if($this->sound) {
+            $payload['message']['android']['notification']['sound'] = $this->sound;
+            $payload['message']['apns']['payload']['aps']['sound'] = $this->sound;
         }
 
         return $this->callApi($payload);
