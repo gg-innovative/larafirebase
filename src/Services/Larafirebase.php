@@ -23,8 +23,6 @@ class Larafirebase
     private $token;
 
     private $topic;
-    
-    private $clickAction;
 
     private $fromRaw;
 
@@ -78,13 +76,6 @@ class Larafirebase
 
         return $this;
     }
-    
-    public function withClickAction($clickAction)
-    {
-        $this->clickAction = $clickAction;
-
-        return $this;
-    }
 
     public function fromRaw($fromRaw)
     {
@@ -105,7 +96,6 @@ class Larafirebase
                     'title' => $this->title,
                     'body' => $this->body,
                     'image' => $this->image,
-                    'click_action' => $this->clickAction,
                 ],
             ],
         ];
